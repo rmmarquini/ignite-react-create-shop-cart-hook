@@ -23,12 +23,11 @@ const CartContext = createContext<CartContextData>({} as CartContextData);
 
 export function CartProvider({ children }: CartProviderProps): JSX.Element {
   const [cart, setCart] = useState<Product[]>(() => {
-    // const storagedCart = Buscar dados do localStorage
-
-    // if (storagedCart) {
-    //   return JSON.parse(storagedCart);
-    // }
-
+    // Verify if exists on LocalStorage a register as RocketShoes:cart
+    const storagedCart = localStorage.getItem('@RocketShoes:cart')
+    if (storagedCart) {
+      return JSON.parse(storagedCart);
+    }
     return [];
   });
 
@@ -36,7 +35,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       // TODO
     } catch {
-      // TODO
+      // Add an error message on failure to add a product into the cart
+      toast.error('Erro na adição do produto')
     }
   };
 
@@ -44,7 +44,8 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       // TODO
     } catch {
-      // TODO
+      // Add an error message on failure to remote a product from the cart
+      toast.error('Erro na remoção do produto')
     }
   };
 
@@ -55,14 +56,13 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
     try {
       // TODO
     } catch {
-      // TODO
+      // Add an error message on failure to update a product on the cart
+      toast.error('Erro na alteração de quantidade do produto')
     }
   };
 
   return (
-    <CartContext.Provider
-      value={{ cart, addProduct, removeProduct, updateProductAmount }}
-    >
+    <CartContext.Provider value={{ cart, addProduct, removeProduct, updateProductAmount }}>
       {children}
     </CartContext.Provider>
   );
