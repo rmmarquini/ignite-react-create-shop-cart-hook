@@ -23,18 +23,24 @@ interface CartItemsAmount {
 
 const Home = (): JSX.Element => {
   const [products, setProducts] = useState<ProductFormatted[]>([]);
-  // const { addProduct, cart } = useCart();
+  const { addProduct, cart } = useCart();
 
-  // const cartItemsAmount = cart.reduce((sumAmount, product) => {
-  //   // TODO
-  // }, {} as CartItemsAmount)
+  // get the quantity of each product in the cart
+  const cartItemsAmount = cart.reduce((sumAmount, product) => {
+    sumAmount[product.id] = product.amount
+    return sumAmount
+  }, {} as CartItemsAmount)
 
+  // load products on the page by requesting the API
   useEffect(() => {
     async function loadProducts() {
-      // TODO
-      const data = await api.get('products')
-        .then(response => (response.data))
-      console.log(data)
+      const response = await api.get<Product[]>('products')
+      // iterate the data from response to create a new object of products 
+      // with the formatted price by evoking the function formatPrice
+      const data = response.data.map(product => ({
+        ...product,
+        priceFormatted: formatPrice(product.price)
+      }))
       setProducts(data)
     }
 
@@ -42,18 +48,19 @@ const Home = (): JSX.Element => {
   }, []);
 
   function handleAddProduct(id: number) {
-    // TODO
+    addProduct(id)
   }
 
   return (
     <ProductList>
 
       {products.map(product => (
+
         <li key={product.id}>
           <img src={product.image} alt={product.title} />
           <strong>{product.title}</strong>
           <span>
-            {formatPrice(product.price)}
+            {product.priceFormatted}
           </span>
           <button
             type="button"
@@ -62,12 +69,13 @@ const Home = (): JSX.Element => {
           >
             <div data-testid="cart-product-quantity">
               <MdAddShoppingCart size={16} color="#FFF" />
-              {/* {cartItemsAmount[product.id] || 0} */} 2
+              {cartItemsAmount[product.id] || 0}
             </div>
 
             <span>ADICIONAR AO CARRINHO</span>
           </button>
         </li>
+
       ))}
 
     </ProductList>
